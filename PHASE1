@@ -1,0 +1,13 @@
+"""
+PHASE 1: Company Mock Database & Backend Logic
+==============================================
+TODO List:
+1. [ ] Create company_mock_sections table
+2. [ ] Add Reasoning and Verbal quizzes
+3. [ ] Create company_coding_questions table
+4. [ ] Add get_company_mock_questions() function
+5. [ ] Add /quiz/company/<company_name> route
+6. [ ] Test the implementation
+"""
+
+print("PHASE 1 TODO created")

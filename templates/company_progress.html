@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}{{ company }} Progress - PrepMaster{% endblock %}
+
+{% block content %}
+<div class="card animate-fade-in">
+    <h2>📊 {{ company }} Progress</h2>
+    <p>Track your preparation level for {{ company }}</p>
+</div>
+
+<!-- Overall Progress -->
+<div class="card">
+    <h3>Overall Progress</h3>
+    <div class="progress-container">
+        <div class="progress-bar" style="height:20px">
+            <div class="progress-fill" style="width:{{ progress_percentage }}%">{{ progress_percentage }}%</div>
+        </div>
+    </div>
+    <p style="text-align:center;margin-top:10px">Average Best Score: <strong>{{ progress_percentage }}%</strong></p>
+</div>
+
+<!-- Level Cards -->
+<div class="level-cards">
+{% for lvl in levels %}
+    <div class="level-card {% if lvl.unlocked %}unlocked{% else %}locked{% endif %}">
+        <div class="level-number">Level {{ lvl.level }}</div>
+        <div class="level-status">
+            {% if lvl.unlocked %}
+                <span class="status-unlocked">✅ Unlocked</span>
+            {% else %}
+                <span class="status-locked">🔒 Locked</span>
+            {% endif %}
+        </div>
+        <div class="level-score">Best: {{ lvl.best_score }}%</div>
+        
+        {% if lvl.unlocked %}
+            <a href="/quiz/company/{{ company|lower }}?level={{ lvl.level }}" class="btn" style="margin-top:10px">Start Test</a>
+        {% else %}
+            <button class="btn btn-disabled" style="margin-top:10px" disabled>Locked</button>
+        {% endif %}
+    </div>
+{% endfor %}
+</div>
+
+<div class="card">
+    <a href="/company-mocks" class="btn">← Back to Companies</a>
+</div>
+
+<style>
+.progress-container{margin:20px 0}
+.progress-bar{height:20px;background:#ecf0f1;border-radius:10px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#3498db,#2ecc71);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:12px}
+.level-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;margin:20px 0}
+.level-card{background:#f8f9fa;padding:20px;border-radius:10px;text-align:center;border:2px solid #dee2e6}
+.level-card.unlocked{border-color:#27ae60;background:#e8f8f0}
+.level-card.locked{border-color:#95a5a6;background:#f4f4f4}
+.level-number{font-size:20px;font-weight:bold;margin-bottom:10px}
+.level-status{margin-bottom:10px}
+.status-unlocked{color:#27ae60}
+.status-locked{color:#95a5a6}
+.level-score{font-size:16px;color:#666;margin-bottom:10px}
+</style>
+{% endblock %}

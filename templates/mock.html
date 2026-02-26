@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Mock Test - PrepMaster{% endblock %}
+
+{% block content %}
+    <div class="card animate-fade-in">
+        <h2>📝 Full-Length Mock Test</h2>
+        <p>Take a comprehensive mock test that combines questions from all categories.</p>
+        <p>This test includes:</p>
+        <ul>
+            <li>Questions from Aptitude, Coding, and Technical</li>
+            <li>Mixed difficulty levels</li>
+            <li>Real-time scoring</li>
+            <li>Detailed explanations</li>
+        </ul>
+    </div>
+
+    <div class="card animate-fade-in" style="text-align: center;">
+        <h2>Select Difficulty Level</h2>
+        <p style="margin-bottom: 20px;">Choose your preferred difficulty level for the mock test:</p>
+        <a href="/quiz/Mock Test/Easy" class="btn">Easy</a>
+        <a href="/quiz/Mock Test/Medium" class="btn">Medium</a>
+        <a href="/quiz/Mock Test/Hard" class="btn">Hard</a>
+    </div>
+
+    <div class="card animate-fade-in">
+        <h2>💡 Tips for Mock Tests</h2>
+        <ul>
+            <li>Find a quiet environment to take the test</li>
+            <li>Manage your time wisely - don't spend too long on one question</li>
+            <li>Review your answers before submitting</li>
+            <li>Use the explanations to learn from mistakes</li>
+        </ul>
+    </div>
+{% endblock %}

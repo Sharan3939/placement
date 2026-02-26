@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Aptitude Preparation{% endblock %}
+
+{% block content %}
+    <h1>Aptitude Preparation</h1>
+
+    <div class="card">
+        <h2>Quantitative Aptitude & Logical Reasoning</h2>
+        <p>Test your mathematical and logical reasoning skills with our comprehensive aptitude quiz.</p>
+        <p>Topics covered:</p>
+        <ul>
+            <li>Percentages & Ratios</li>
+            <li>Speed & Distance</li>
+            <li>Averages & Statistics</li>
+            <li>Profit & Loss</li>
+            <li>Permutations & Combinations</li>
+        </ul>
+    </div>
+
+    <div class="card" style="text-align: center;">
+        <h2>Select Difficulty Level</h2>
+        <p style="margin-bottom: 20px;">Choose your preferred difficulty level to start the quiz:</p>
+        <a href="/quiz/Aptitude/Easy" class="btn" style="margin: 10px;">Easy</a>
+        <a href="/quiz/Aptitude/Medium" class="btn" style="margin: 10px;">Medium</a>
+        <a href="/quiz/Aptitude/Hard" class="btn" style="margin: 10px;">Hard</a>
+    </div>
+{% endblock %}

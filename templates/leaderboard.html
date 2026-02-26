@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Leaderboard - PrepMaster{% endblock %}
+
+{% block content %}
+    <div class="leaderboard-container">
+        <div class="leaderboard-title">
+            <h1>🏆 Global Leaderboard</h1>
+            <p style="color:#777;">Rankings based on average percentage</p>
+        </div>
+
+        {% if leaderboard %}
+        <table class="leaderboard-table">
+            <thead>
+                <tr>
+                    <th style="width:80px;">Rank</th>
+                    <th>Username</th>
+                    <th style="width:150px;">Quizzes</th>
+                    <th style="width:150px;">Average %</th>
+                    <th style="width:150px;">Total Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in leaderboard %}
+                <tr {% if item.is_current %}class="highlight"{% endif %}>
+                    <td class="rank-badge">
+                        {% if item.rank == 1 %}🥇
+                        {% elif item.rank == 2 %}🥈
+                        {% elif item.rank == 3 %}🥉
+                        {% else %}{{ item.rank }}
+                        {% endif %}
+                    </td>
+                    <td>{{ item.username }}</td>
+                    <td>{{ item.quizzes_completed }}</td>
+                    <td>{{ item.avg_percentage }}%</td>
+                    <td>{{ item.total_score }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <p style="text-align:center; color:#6f0757;">No users yet.</p>
+        {% endif %}
+
+        <div class="back-btn">
+            <a href="/" class="btn">Back to Home</a>
+        </div>
+    </div>
+{% endblock %}

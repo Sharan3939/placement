@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz - {{ category }}{% endblock %}
+
+{% block content %}
+
+    <!-- Hidden Data (Editor Errors Avoid Cheyyadaniki) -->
+    <div id="quiz-data"
+         data-total="{{ questions|length if questions else 0 }}"
+         data-quizid="{{ quiz_id if quiz_id else 0 }}"
+         data-level="{{ level if level else 'Mixed' }}"
+         data-category="{{ category }}">
+    </div>
+
+    <h1>{{ category }} Quiz</h1>
+
+    <div class="quiz-info">
+        <p><strong>Difficulty: </strong>
+            <span style="color: #667eea; font-weight: bold;">
+                {{ level if level else 'Mixed' }}
+            </span>
+        </p>
+        <p><strong>Total Questions: </strong>
+            <span id="total-questions">
+                {{ questions|length if questions else 0 }}
+            </span>
+        </p>
+        <p><strong>Instructions:</strong> Select one answer for each question and click Submit when done.</p>
+    </div>
+
+    <div class="progress-bar" id="progress-bar" style="width: 0%;">0%</div>
+
+    <form id="quiz-form">
+
+        {% if questions %}
+            {% for question in questions %}
+            <div class="question-box">
+                <h3>{{ loop.index }}. {{ question.question }}</h3>
+
+                <div class="options">
+                    <label class="option">
+                        <input type="radio" name="question_{{ question.id }}"
+                               value="{{ question.option1 }}"
+                               onchange="updateProgress()">
+                        {{ question.option1 }}
+                    </label>
+
+                    <label class="option">
+                        <input type="radio" name="question_{{ question.id }}"
+                               value="{{ question.option2 }}"
+                               onchange="updateProgress()">
+                        {{ question.option2 }}
+                    </label>
+
+                    <label class="option">
+                        <input type="radio" name="question_{{ question.id }}"
+                               value="{{ question.option3 }}"
+                               onchange="updateProgress()">
+                        {{ question.option3 }}
+                    </label>
+
+                    <label class="option">
+                        <input type="radio" name="question_{{ question.id }}"
+                               value="{{ question.option4 }}"
+                               onchange="updateProgress()">
+                        {{ question.option4 }}
+                    </label>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p>No questions available.</p>
+        {% endif %}
+
+    </form>
+
+    <div style="text-align:center; margin:30px 0;">
+        <button type="button" onclick="submitQuiz()" class="btn">Submit Quiz</button>
+        <a href="/" class="btn">Back to Home</a>
+    </div>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function() {
+
+    const quizData = document.getElementById("quiz-data");
+
+    const totalQuestions = parseInt(quizData.dataset.total);
+    const quizId = parseInt(quizData.dataset.quizid);
+    const quizLevel = quizData.dataset.level;
+    const quizCategory = quizData.dataset.category;
+
+    window.totalQuestions = totalQuestions;
+    window.quizId = quizId;
+    window.quizLevel = quizLevel;
+    window.quizCategory = quizCategory;
+
+});
+
+function updateProgress() {
+
+    if (!window.totalQuestions || window.totalQuestions === 0) return;
+
+    const answered = document.querySelectorAll('input[type="radio"]:checked').length;
+    const percentage = Math.round((answered / window.totalQuestions) * 100);
+
+    const progressBar = document.getElementById('progress-bar');
+    progressBar.style.width = percentage + '%';
+    progressBar.textContent = percentage + '%';
+}
+
+function submitQuiz() {
+
+    if (!window.totalQuestions || window.totalQuestions === 0) {
+        alert("No questions available.");
+        return;
+    }
+
+    const form = document.getElementById('quiz-form');
+    const radioButtons = form.querySelectorAll('input[type="radio"]');
+
+    const answers = {};
+    let allAnswered = true;
+
+    const questionNames = new Set();
+    radioButtons.forEach(radio => {
+        questionNames.add(radio.name);
+    });
+
+    questionNames.forEach(name => {
+        const checked = form.querySelector('input[name="' + name + '"]:checked');
+        if (checked) {
+            const questionId = name.replace('question_', '');
+            answers[questionId] = checked.value;
+        } else {
+            allAnswered = false;
+        }
+    });
+
+    if (!allAnswered) {
+        alert("Please answer all questions before submitting!");
+        return;
+    }
+
+    fetch('/api/submit-quiz', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            quiz_id: window.quizId,
+            answers: answers
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('HTTP error, status = ' + response.status);
+        }
+        return response.json();
+    })
+    .then(data => {
+        data.level = window.quizLevel;
+        data.category = window.quizCategory;
+        sessionStorage.setItem('quiz_results', JSON.stringify(data));
+        window.location.href = '/results';
+    })
+    .catch(error => {
+        alert("Error submitting quiz: " + error.message);
+    });
+}
+
+</script>
+
+{% endblock %}

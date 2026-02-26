@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ problem.title }} - Code Practice</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/">Home</a>
+        <a href="/aptitude">Aptitude</a>
+        <a href="/coding">Coding</a>
+        <a href="/technical">Technical</a>
+        <a href="/mock">Mock Test</a>
+        <a href="/code-practice">Coding Practice</a>
+        <a href="/profile" style="margin-left: auto;">Profile</a>
+        <a href="/logout">Logout</a>
+    </nav>
+    
+    <div class="container">
+        <h1>{{ problem.title }}</h1>
+        
+        <div class="card">
+            <p><strong>Difficulty:</strong> 
+                <span class="difficulty {{ problem.difficulty.lower() }}">{{ problem.difficulty }}</span>
+            </p>
+        </div>
+        
+        <div class="card">
+            <h2>Problem Description</h2>
+            <p>{{ problem.description }}</p>
+        </div>
+        
+        {% if problem.input_format %}
+        <div class="card">
+            <h2>Input Format</h2>
+            <pre style="background: #f5f5f5; padding: 15px; border-radius: 5px; overflow-x: auto;">{{ problem.input_format }}</pre>
+        </div>
+        {% endif %}
+        
+        {% if problem.output_format %}
+        <div class="card">
+            <h2>Output Format</h2>
+            <pre style="background: #f5f5f5; padding: 15px; border-radius: 5px; overflow-x: auto;">{{ problem.output_format }}</pre>
+        </div>
+        {% endif %}
+        
+        {% if problem.constraints %}
+        <div class="card">
+            <h2>Constraints</h2>
+            <pre style="background: #f5f5f5; padding: 15px; border-radius: 5px; overflow-x: auto;">{{ problem.constraints }}</pre>
+        </div>
+        {% endif %}
+        
+        <div style="margin-top: 20px;">
+            <a href="/code-practice" class="btn">Back to Code Practice</a>
+        </div>
+    </div>
+</body>
+</html>

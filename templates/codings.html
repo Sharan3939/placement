@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Python Coding Practice{% endblock %}
+
+{% block content %}
+    <h1>Python Coding Practice</h1>
+
+    <h2>1️⃣ Variables</h2>
+    <p>Variables are used to store data values.</p>
+    <pre>
+x = 10
+name = "John"
+    </pre>
+
+    <h2>2️⃣ Data Types</h2>
+    <p>int, float, string, list, tuple, dictionary</p>
+
+    <h2>3️⃣ If-Else</h2>
+    <pre>
+x = 10
+if x > 5:
+    print("Greater")
+else:
+    print("Smaller")
+    </pre>
+
+    <h2>4️⃣ Loops</h2>
+    <pre>
+for i in range(5):
+    print(i)
+    </pre>
+
+    <h2>5️⃣ Functions</h2>
+    <pre>
+def add(a, b):
+    return a + b
+
+print(add(5,3))
+    </pre>
+
+    <h2>6️⃣ Lists</h2>
+    <pre>
+numbers = [1,2,3,4]
+print(numbers[0])
+    </pre>
+
+    <h2>7️⃣ Practice Questions</h2>
+    <p>Q1: Write a program to check if a number is even or odd.</p>
+    <p>Q2: Write a program to reverse a string.</p>
+    <p>Q3: Write a program to find the largest number in a list.</p>
+{% endblock %}

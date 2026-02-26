@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Technical - PrepMaster{% endblock %}
+
+{% block content %}
+    <div class="card animate-fade-in">
+        <h2>⚙️ Technical Knowledge</h2>
+        <p>Test your computer science and technical knowledge with our comprehensive technical quiz.</p>
+        <p>Topics covered:</p>
+        <ul>
+            <li>Data Structures & Algorithms</li>
+            <li>Database Management</li>
+            <li>Operating Systems</li>
+            <li>Computer Networks</li>
+            <li>Object-Oriented Programming</li>
+        </ul>
+    </div>
+
+    <div class="card animate-fade-in" style="text-align: center;">
+        <h2>Select Difficulty Level</h2>
+        <p style="margin-bottom: 20px;">Choose your preferred difficulty level to start the quiz:</p>
+        <a href="/quiz/Technical/Easy" class="btn">Easy</a>
+        <a href="/quiz/Technical/Medium" class="btn">Medium</a>
+        <a href="/quiz/Technical/Hard" class="btn">Hard</a>
+    </div>
+{% endblock %}

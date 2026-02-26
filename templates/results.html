@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz Results{% endblock %}
+
+{% block content %}
+    <h1>📊 Quiz Results</h1>
+
+    <div id="results-content">
+        <div class="result-box">
+            <h2>Score: <span class="score" id="score">0</span> / <span id="total">0</span></h2>
+            <p class="percentage">Percentage: <span id="percentage">0</span>%</p>
+            <p id="performance-message" style="font-size: 18px; color: #667eea; margin-top: 15px;"></p>
+            <p id="difficulty-info" style="font-size: 14px; color: #999; margin-top: 10px;"></p>
+        </div>
+
+        <div id="level-progression" style="text-align: center; margin: 30px 0; padding: 20px; background: #e8eaf6; border-radius: 8px; display: none;">
+            <h3 style="color: #667eea; margin-bottom: 15px;" id="progression-title">Excellent! Ready for the Next Challenge?</h3>
+            <p id="progression-message" style="color: #666; margin-bottom: 20px;"></p>
+            <a id="next-level-btn" href="#" class="btn" style="padding: 15px 30px; font-size: 16px; margin-right: 10px;">Proceed to Next Level →</a>
+            <a id="retry-btn" href="#" class="btn" style="padding: 15px 30px; font-size: 16px; background: #ff9800;">Retry This Level</a>
+        </div>
+
+        <div class="results-container" id="results-list">
+            <!-- Results will be populated here -->
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="/" class="btn">Back to Home</a>
+            <button onclick="retakeQuiz()" class="btn">Retake Quiz</button>
+        </div>
+    </div>
+
+<script>
+const levelProgression = {
+    'Easy': 'Medium',
+    'Medium': 'Hard',
+    'Hard': null
+};
+
+function getNextLevel(currentLevel) {
+    return levelProgression[currentLevel] || null;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const resultsData = sessionStorage.getItem('quiz_results');
+    
+    if (!resultsData) {
+        document.getElementById('results-content').innerHTML = '<p style="text-align: center;">No quiz results found. <a href="/">Go back to home</a></p>';
+        return;
+    }
+
+    const results = JSON.parse(resultsData);
+    const currentLevel = results.level || 'Mixed';
+    const category = results.category || 'Unknown';
+    const percentage = results.percentage || 0;
+    const nextLevel = getNextLevel(currentLevel);
+    
+    // Update score display
+    document.getElementById('score').textContent = results.score;
+    document.getElementById('total').textContent = results.total;
+    document.getElementById('percentage').textContent = percentage;
+    document.getElementById('difficulty-info').textContent = `Difficulty: ${currentLevel}`;
+
+    // Performance message
+    let message = '';
+    if (percentage >= 80) {
+        message = '🎉 Excellent Performance! Outstanding work!';
+    } else if (percentage >= 75) {
+        message = '✨ Great Job! Ready to level up!';
+    } else if (percentage >= 60) {
+        message = '👍 Good Job! Review and try the next level.';
+    } else if (percentage >= 40) {
+        message = '📚 Keep Practicing! You\'re on the right track.';
+    } else {
+        message = '💪 Don\'t give up! Practice more and retry.';
+    }
+    document.getElementById('performance-message').textContent = message;
+
+    // Show progression UI
+    const progressionDiv = document.getElementById('level-progression');
+    const nextLevelBtn = document.getElementById('next-level-btn');
+    const retryBtn = document.getElementById('retry-btn');
+    const progressionTitle = document.getElementById('progression-title');
+    const progressionMessage = document.getElementById('progression-message');
+
+    if (percentage >= 75) {
+        progressionDiv.style.display = 'block';
+        
+        if (nextLevel) {
+            // Show next level button
+            progressionTitle.textContent = `🎯 Congratulations! You're Ready for ${nextLevel}!`;
+            progressionMessage.textContent = `You scored ${percentage}% on ${currentLevel}. Ready to challenge yourself with ${nextLevel} questions?`;
+            nextLevelBtn.href = `/quiz/${category}/${nextLevel}`;
+            nextLevelBtn.style.display = 'inline-block';
+            retryBtn.textContent = 'Stay at This Level';
+            retryBtn.href = `/quiz/${category}/${currentLevel}`;
+        } else {
+            // Hard level completed
+            progressionTitle.textContent = '🏆 You\'re a Master!';
+            progressionMessage.textContent = `Amazing! You scored ${percentage}% on Hard level. You've completed all difficulty levels!`;
+            nextLevelBtn.style.display = 'none';
+            retryBtn.textContent = 'Try Other Categories';
+            retryBtn.href = '/';
+        }
+    } else {
+        progressionDiv.style.display = 'block';
+        progressionTitle.textContent = '📖 Need More Practice?';
+        progressionMessage.textContent = `You scored ${percentage}% on ${currentLevel}. Practice once more to master this level (target: 75%+)`;
+        nextLevelBtn.style.display = 'none';
+        retryBtn.textContent = 'Retry This Level';
+        retryBtn.href = `/quiz/${category}/${currentLevel}`;
+    }
+
+    // Display detailed results
+    const resultsList = document.getElementById('results-list');
+    resultsList.innerHTML = '';
+
+    results.results.forEach((result, index) => {
+        const resultHTML = `
+            <div class="result-item ${result.is_correct ? 'correct' : 'incorrect'}">
+                <h4>${index + 1}. ${result.question}</h4>
+                <p>Your Answer: <span class="user-answer">${result.user_answer}</span></p>
+                <p>Correct Answer: <span class="correct-answer">${result.correct_answer}</span></p>
+                <div class="explanation">
+                    <strong>Explanation:</strong> ${result.explanation}
+                </div>
+            </div>
+        `;
+        resultsList.innerHTML += resultHTML;
+    });
+
+    // Clear session storage after displaying
+    sessionStorage.removeItem('quiz_results');
+});
+
+function retakeQuiz() {
+    history.back();
+}
+</script>
+{% endblock %}

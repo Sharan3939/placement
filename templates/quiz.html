@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}{{ category }} Quiz{% endblock %}
+
+{% block content %}
+    <h1>{{ category }} Quiz</h1>
+
+    <div class="quiz-info">
+        <p><strong>Difficulty:</strong> {{ level if level else 'Mixed' }}</p>
+        <p><strong>Total Questions:</strong> 
+            <span id="total-questions">{{ questions|length if questions else 0 }}</span>
+        </p>
+        <p><strong>Instructions:</strong> Select one answer for each question and click Submit when done.</p>
+    </div>
+
+    <div class="progress-bar" id="progress-bar" style="width: 0%;">0%</div>
+
+    <form id="quiz-form">
+
+        {% if questions %}
+            {% for question in questions %}
+            <div class="question-box">
+                <h3>{{ loop.index }}. {{ question.question }}</h3>
+
+                <div class="options">
+                    {% for option in [question.option1, question.option2, question.option3, question.option4] %}
+                    <label class="option">
+                        <input type="radio"
+                               name="question_{{ question.id }}"
+                               value="{{ option }}"
+                               onchange="updateProgress()">
+                        {{ option }}
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p>No questions available.</p>
+        {% endif %}
+
+    </form>
+
+    <!-- Buttons Outside White Box -->
+    <div class="button-section">
+        <button type="button" onclick="submitQuiz()" class="btn">Submit Quiz</button>
+        <a href="/" class="btn">Back to Home</a>
+    </div>
+
+    <!-- Jinja values moved safely -->
+    <script>
+        const totalQuestions = Number("{{ questions|length if questions else 0 }}");
+        const quizId = Number("{{ quiz_id if quiz_id else 0 }}");
+        const difficultyLevel = "{{ level if level else 'Mixed' }}";
+        const categoryName = "{{ category }}";
+    </script>
+
+    <script>
+function updateProgress() {
+    if (totalQuestions === 0) return;
+
+    const answered = document.querySelectorAll('input[type="radio"]:checked').length;
+    const percentage = Math.round((answered / totalQuestions) * 100);
+
+    const progressBar = document.getElementById('progress-bar');
+    progressBar.style.width = percentage + '%';
+    progressBar.textContent = percentage + '%';
+}
+
+function submitQuiz() {
+    if (totalQuestions === 0) {
+        alert("No questions available.");
+        return;
+    }
+
+    const form = document.getElementById('quiz-form');
+    const radioButtons = form.querySelectorAll('input[type="radio"]');
+    
+    const answers = {};
+    let allAnswered = true;
+    
+    const questionNames = new Set();
+    radioButtons.forEach(radio => {
+        questionNames.add(radio.name);
+    });
+    
+    questionNames.forEach(name => {
+        const checked = form.querySelector(`input[name="${name}"]:checked`);
+        if (checked) {
+            const questionId = name.replace('question_', '');
+            answers[questionId] = checked.value;
+        } else {
+            allAnswered = false;
+        }
+    });
+
+    if (!allAnswered) {
+        alert("Please answer all questions before submitting!");
+        return;
+    }
+
+    fetch('/api/submit-quiz', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            quiz_id: quizId,
+            difficulty: difficultyLevel,
+            answers: answers
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        data.level = difficultyLevel;
+        data.category = categoryName;
+        sessionStorage.setItem('quiz_results', JSON.stringify(data));
+        window.location.href = '/results';
+    })
+    .catch(error => {
+        alert("Error submitting quiz: " + error.message);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const options = document.querySelectorAll('.option input[type="radio"]');
+    options.forEach(option => {
+        option.addEventListener('change', function() {
+            const optionLabel = this.closest('.option');
+            optionLabel.closest('.options').querySelectorAll('.option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            optionLabel.classList.add('selected');
+        });
+    });
+});
+    </script>
+{% endblock %}

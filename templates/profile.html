@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile - PrepMaster{% endblock %}
+
+{% block content %}
+    <!-- Profile Header -->
+    <div class="profile-header">
+        <div class="profile-avatar">
+            {{ user.username[0].upper() }}
+        </div>
+        <div>
+            <h1>{{ user.username }}</h1>
+            <p>📧 {{ user.email }}</p>
+            <p>📱 {{ user.mobile_number }}</p>
+            <p>⚧️ {{ user.gender }} | 🎂 {{ user.age }} years</p>
+            <p>Joined on {{ user.created_at[:10] }}</p>
+            {% if user_rank %}
+            <div class="rank-badge">🏆 Rank #{{ user_rank }}</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Personal Info -->
+    <h2 class="section-title">Personal Information</h2>
+    <div class="info-grid">
+        <div class="card-box"><h3>Email</h3><p>{{ user.email }}</p></div>
+        <div class="card-box"><h3>Mobile</h3><p>{{ user.mobile_number }}</p></div>
+        <div class="card-box"><h3>Gender</h3><p>{{ user.gender }}</p></div>
+        <div class="card-box"><h3>Age</h3><p>{{ user.age }}</p></div>
+    </div>
+
+    <!-- Stats -->
+    <h2 class="section-title">Quiz Statistics</h2>
+    <div class="stats-grid">
+        <div class="card-box"><h3>Quizzes</h3><p>{{ stats.total_quizzes or 0 }}</p></div>
+        <div class="card-box"><h3>Average</h3><p>{{ stats.avg_percentage or 0 }}%</p></div>
+        <div class="card-box"><h3>Best</h3><p>{{ stats.best_score or 0 }}%</p></div>
+        <div class="card-box"><h3>Total Points</h3><p>{{ stats.total_score or 0 }}</p></div>
+    </div>
+
+    <!-- Recent -->
+    <h2 class="section-title">Recent Quiz Attempts</h2>
+
+    {% if recent_quizzes %}
+    <div class="recent-quizzes">
+        {% for quiz in recent_quizzes %}
+        <div class="quiz-item">
+            <div>
+                <strong>{{ quiz.quiz_name }}</strong><br>
+                <small>{{ quiz.completed_at[:10] }}</small>
+            </div>
+            <div>
+                <span class="difficulty 
+                {% if quiz.difficulty=='Easy' %}easy
+                {% elif quiz.difficulty=='Medium' %}medium
+                {% else %}hard{% endif %}">
+                    {{ quiz.difficulty }}
+                </span>
+                <span class="score">{{ quiz.percentage }}%</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+        <p>No quizzes attempted yet.</p>
+    {% endif %}
+
+    <div style="text-align:center;">
+        <a href="/" class="btn">← Back to Home</a>
+    </div>
+{% endblock %}

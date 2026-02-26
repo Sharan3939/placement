@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Home - PrepMaster{% endblock %}
+
+{% block content %}
+    <div class="welcome-section animate-fade-in">
+        <h1>Welcome to PrepMaster! 🚀</h1>
+        <p>Your ultimate placement preparation platform. Master aptitude, coding, and technical skills.</p>
+    </div>
+
+    <div class="stats-row animate-fade-in">
+        <div class="stat-box">
+            <h2>120+</h2>
+            <p>Questions</p>
+        </div>
+        <div class="stat-box">
+            <h2>3</h2>
+            <p>Categories</p>
+        </div>
+        <div class="stat-box">
+            <h2>3</h2>
+            <p>Difficulty Levels</p>
+        </div>
+        <div class="stat-box">
+            <h2>7</h2>
+            <p>Languages</p>
+        </div>
+    </div>
+
+    <div class="card animate-fade-in">
+        <h2>📚 Quiz Categories</h2>
+        <div class="quiz-grid">
+            <a href="/aptitude" class="quiz-card">
+                <h3>🧠 Aptitude</h3>
+                <p>Quantitative & Logical Reasoning</p>
+            </a>
+            <a href="/coding" class="quiz-card">
+                <h3>💻 Coding</h3>
+                <p>Programming & Algorithms</p>
+            </a>
+            <a href="/technical" class="quiz-card">
+                <h3>⚙️ Technical</h3>
+                <p>Computer Science Fundamentals</p>
+            </a>
+            <a href="/mock" class="quiz-card">
+                <h3>📝 Mock Test</h3>
+                <p>Full-Length Practice Tests</p>
+            </a>
+        </div>
+    </div>
+
+    <div class="card animate-fade-in">
+        <h2>🎯 Quick Actions</h2>
+        <div class="info-grid">
+            <a href="/code-practice" class="card-box">
+                <h3>Code Practice</h3>
+                <p>💻 Write & Run Code</p>
+            </a>
+            <a href="/leaderboard" class="card-box">
+                <h3>Leaderboard</h3>
+                <p>🏆 View Rankings</p>
+            </a>
+            <a href="/profile" class="card-box">
+                <h3>My Profile</h3>
+                <p>👤 View Stats</p>
+            </a>
+        </div>
+    </div>
+{% endblock %}

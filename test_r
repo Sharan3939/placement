@@ -1,0 +1,64 @@
+import requests
+import json
+
+BASE_URL = "http://127.0.0.1:5000"
+
+# Test 1: Login
+print("=== Test 1: Login ===")
+session =# First register a test user
+ requests.Session()
+
+register_data = {
+    "email": "test@example.com",
+    "username": "testuser",
+    "password": "test123",
+    "confirm_password": "test123",
+    "mobile_number": "1234567890",
+    "gender": "Male",
+    "age": "20"
+}
+
+# Try login with existing user or register
+login_data = {
+    "email": "test@example.com",
+    "password": "test123"
+}
+
+r = session.post(f"{BASE_URL}/login", data=login_data, allow_redirects=False)
+print(f"Login status: {r.status_code}")
+print(f"Redirect: {r.headers.get('Location', 'None')}")
+
+# Test 2: Company Mocks
+print("\n=== Test 2: Company Mocks ===")
+r = session.get(f"{BASE_URL}/company-mocks")
+print(f"Company mocks status: {r.status_code}")
+if "TCS" in r.text or "tcs" in r.text.lower():
+    print("✓ TCS company found in response")
+else:
+    print("✗ TCS company NOT found")
+
+# Test 3: TCS Quiz
+print("\n=== Test 3: TCS Quiz ===")
+r = session.get(f"{BASE_URL}/quiz/company/tcs")
+print(f"TCS quiz status: {r.status_code}")
+if r.status_code == 200:
+    print("✓ TCS quiz loaded successfully")
+else:
+    print(f"✗ TCS quiz error: {r.text[:200]}")
+
+# Test 4: Submit Quiz API
+print("\n=== Test 4: Submit Quiz API ===")
+submit_data = {
+    "quiz_id": 5,
+    "answers": {"q1": "30", "q2": "300 km"},
+    "difficulty": "Easy"
+}
+r = session.post(f"{BASE_URL}/api/submit-quiz", json=submit_data)
+print(f"Submit status: {r.status_code}")
+if r.status_code == 200:
+    result = r.json()
+    print(f"✓ Submit response: {result.get('score', 'N/A')}")
+else:
+    print(f"✗ Submit error: {r.text[:200]}")
+
+print("\n=== All Tests Complete ===")

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Coding - PrepMaster{% endblock %}
+
+{% block content %}
+    <div class="card animate-fade-in">
+        <h2>💻 Programming & Coding</h2>
+        <p>Test your programming skills and problem-solving abilities with our coding quiz.</p>
+        <p>Topics covered:</p>
+        <ul>
+            <li>C Programming</li>
+            <li>C++ & OOP</li>
+            <li>Java Fundamentals</li>
+            <li>Python Programming</li>
+            <li>Problem Solving</li>
+        </ul>
+    </div>
+
+    <div class="card animate-fade-in" style="text-align: center;">
+        <h2>Select Difficulty Level</h2>
+        <p style="margin-bottom: 20px;">Choose your preferred difficulty level to start the quiz:</p>
+        <a href="/quiz/Coding/Easy" class="btn">Easy</a>
+        <a href="/quiz/Coding/Medium" class="btn">Medium</a>
+        <a href="/quiz/Coding/Hard" class="btn">Hard</a>
+    </div>
+
+    <div class="card animate-fade-in">
+        <h2>💡 Practice More</h2>
+        <p>Want to write and run actual code? Try our online code compiler!</p>
+        <a href="/code-practice" class="btn">Open Code Compiler</a>
+    </div>
+{% endblock %}
