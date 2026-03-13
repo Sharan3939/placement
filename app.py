@@ -290,143 +290,67 @@ def company_mock_test(company_name):
         coding_questions=questions_data['coding_questions'],
         total_mcqs=len(all_mcqs),
         total_coding=len(questions_data['coding_questions']))
-
 @app.route("/api/submit-quiz", methods=["POST"])
 @login_required
 def submit_quiz():
+
     data = request.get_json()
-    quiz_id = data.get('quiz_id')
-    answers = data.get('answers', {})
-    difficulty = data.get('difficulty', 'Easy')
-    user_id = session.get('user_id')
-    
+
+    answers = data.get("answers", {})
+    quiz_id = data.get("quiz_id")
+    difficulty = data.get("difficulty", "Easy")
+
     conn = get_db_connection()
     cursor = conn.cursor()
-    
-    # Section-wise scoring (for company mocks)
-    section_scores = {}
-    section_total = {}
-    
+
     score = 0
     total = 0
-    results = []
-    
-    for q_id, user_answer in answers.items():
-        # Parse section info from answer key (format: q{id}_{section} or just q{id} for coding)
-        section = 'Coding'
-        actual_q_id = q_id
-        
-        if '_' in q_id and q_id.startswith('q'):
-            parts = q_id.rsplit('_', 1)
-            if parts[0].startswith('q'):
-                try:
-                    actual_q_id = int(parts[0][1:])
-                    section = parts[1]
-                except:
-                    actual_q_id = q_id
-        
-        # Check if it's a coding question (starts with code_)
-        if str(q_id).startswith('code_'):
-            section = 'Coding'
-            actual_q_id = q_id
-        
-        total += 1
-        
-        # Get question from database (only for MCQs, not coding)
-        if str(actual_q_id).startswith('q'):
+
+    for key, user_answer in answers.items():
+
+        # question_12 → 12
+        try:
+            q_id = int(key)
+        except:
             try:
-                actual_q_id = int(str(actual_q_id)[1:])
+                q_id = int(key.replace("question_", ""))
             except:
-                pass
-        
-        if isinstance(actual_q_id, int):
-            cursor.execute("""SELECT question, correct_answer, explanation FROM questions WHERE id = ?""", (actual_q_id,))
-            question_data = cursor.fetchone()
-            if question_data:
-                is_correct = user_answer == question_data['correct_answer']
-                if is_correct:
-                    score += 1
-                    # Track section-wise score
-                    section_scores[section] = section_scores.get(section, 0) + 1
-                section_total[section] = section_total.get(section, 0) + 1
-                results.append({
-                    'question': question_data['question'],
-                    'user_answer': user_answer,
-                    'correct_answer': question_data['correct_answer'],
-                    'is_correct': is_correct,
-                    'section': section
-                })
+                continue
+
+        cursor.execute("""
+        SELECT option1, option2, option3, option4, correct_answer
+        FROM questions WHERE id = ?
+        """, (q_id,))
+
+        question = cursor.fetchone()
+
+        if not question:
+            continue
+
+        total += 1
+
+        correct_letter = question["correct_answer"]
+
+        if correct_letter == "A":
+            correct_value = question["option1"]
+        elif correct_letter == "B":
+            correct_value = question["option2"]
+        elif correct_letter == "C":
+            correct_value = question["option3"]
         else:
-            # Coding question - just count as attempted
-            section_total['Coding'] = section_total.get('Coding', 0) + 1
-    
-    # Calculate percentages
+            correct_value = question["option4"]
+
+        if str(user_answer).strip() == str(correct_value).strip():
+            score += 1
+
     percentage = (score / total * 100) if total > 0 else 0
-    
-    # Section-wise percentages
-    section_breakdown = []
-    for section in ['Aptitude', 'Reasoning', 'Verbal', 'Technical', 'Coding']:
-        if section in section_total:
-            s_score = section_scores.get(section, 0)
-            s_total = section_total[section]
-            s_pct = (s_score / s_total * 100) if s_total > 0 else 0
-            section_breakdown.append({
-                'name': section,
-                'score': s_score,
-                'total': s_total,
-                'percentage': round(s_pct, 1)
-            })
-    
-    # Company readiness calculation (total 25 questions = 100 points)
-    # MCQs: 22 questions (1 point each), Coding: 3 questions (26 points each = 78 total)
-    # Simplified: Each question worth 4 points (25 * 4 = 100)
-    readiness = percentage  # Same as percentage for now
-    
-    # Readiness status
-    if readiness >= 80:
-        readiness_status = "Interview Ready"
-    elif readiness >= 60:
-        readiness_status = "Almost Ready"
-    elif readiness >= 40:
-        readiness_status = "Needs Improvement"
-    else:
-        readiness_status = "Not Ready"
-    
-    # Calculate XP earned
-    xp_earned = XP_REWARDS.get(difficulty, 10)
-    if percentage >= 90:
-        xp_earned += 5
-    elif percentage >= 70:
-        xp_earned += 2
-    
-    # Save user score and update XP
-    try:
-        cursor.execute("""INSERT INTO user_scores (user_id, quiz_id, difficulty, score, total, percentage)
-        VALUES (?, ?, ?, ?, ?, ?)""", (user_id, quiz_id, difficulty, score, total, percentage))
-        cursor.execute("UPDATE xp_points SET xp = xp + ?, total_quizzes = total_quizzes + 1 WHERE user_id = ?", (xp_earned, user_id))
-        cursor.execute("""INSERT INTO xp_history (user_id, xp_amount, transaction_type, description, related_id)
-        VALUES (?, ?, 'quiz_completion', ?, ?)""", (user_id, xp_earned, f'Completed {difficulty} quiz', quiz_id))
-        cursor.execute("""UPDATE user_stats SET total_tests = total_tests + 1, total_correct = total_correct + ?,
-        total_questions = total_questions + ? WHERE user_id = ?""", (score, total, user_id))
-        conn.commit()
-    except Exception as e:
-        print(f"Error saving score: {e}")
-    
+
     conn.close()
-    
-    # Update category performance for adaptive difficulty
-    adaptive_result = _update_category_performance(user_id, quiz_id, difficulty, score, total)
-    
+
     return jsonify({
-        'score': score,
-        'total': total,
-        'percentage': round(percentage, 2),
-        'section_scores': section_breakdown,
-        'readiness': round(readiness, 1),
-        'readiness_status': readiness_status,
-        'results': results,
-        'xp_earned': xp_earned,
-        'adaptive': adaptive_result
+        "score": score,
+        "total": total,
+        "percentage": round(percentage, 2)
     })
 
 @app.route("/results")
